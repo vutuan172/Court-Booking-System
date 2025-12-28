@@ -1,0 +1,472 @@
+{
+  "info": {
+    "name": "Court Booking API",
+    "description": "API collection for Court Booking Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"phoneNumber\": \"0123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "user@example.com"
+                },
+                {
+                  "key": "password",
+                  "value": "password123"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courts",
+      "item": [
+        {
+          "name": "Get All Courts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/courts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courts"]
+            }
+          }
+        },
+        {
+          "name": "Get Courts by Filter",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/courts?type=football&location=North",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courts"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "football"
+                },
+                {
+                  "key": "location",
+                  "value": "North"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Court Schedules",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/courts/1/schedules?date=2024-12-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courts", "1", "schedules"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-12-15"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courtId\": 1,\n  \"scheduleId\": 1,\n  \"note\": \"Birthday party\",\n  \"orderItems\": [\n    {\n      \"serviceItemId\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"serviceItemId\": 5,\n      \"quantity\": 4\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Create Booking (Duplicate - Should Fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courtId\": 1,\n  \"scheduleId\": 1,\n  \"note\": \"Attempting duplicate booking\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get User Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/users/2/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "2", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bookings", "1"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/1/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bookings", "1", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excellent court! Well maintained and great service.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bookings", "1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Court Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/public/reviews?courtId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "public", "reviews"],
+              "query": [
+                {
+                  "key": "courtId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Get All Services",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/public/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "public", "services"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Courts",
+      "item": [
+        {
+          "name": "Get All Courts (Admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts"]
+            }
+          }
+        },
+        {
+          "name": "Create Court",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Basketball Court A\",\n  \"type\": \"basketball\",\n  \"location\": \"West District\",\n  \"description\": \"Indoor basketball court with AC\",\n  \"basePricePerHour\": 90000,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts"]
+            }
+          }
+        },
+        {
+          "name": "Update Court",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Basketball Court A - Premium\",\n  \"type\": \"basketball\",\n  \"location\": \"West District\",\n  \"description\": \"Indoor basketball court with AC and new flooring\",\n  \"basePricePerHour\": 100000,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts/5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts", "5"]
+            }
+          }
+        },
+        {
+          "name": "Delete Court",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts/5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts", "5"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Services",
+      "item": [
+        {
+          "name": "Get All Services (Admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "services"]
+            }
+          }
+        },
+        {
+          "name": "Create Service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sports Shoes Rental\",\n  \"category\": \"OTHER\",\n  \"unitPrice\": 50000,\n  \"description\": \"Professional sports shoes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "services"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Bookings",
+      "item": [
+        {
+          "name": "Get All Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get Bookings by Date",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings?date=2024-12-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-12-15"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DONE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings", "1", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Reports",
+      "item": [
+        {
+          "name": "Revenue Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/reports/revenue?from=2024-12-01&to=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "reports", "revenue"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-12-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Top Services Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/reports/top-services?from=2024-12-01&to=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "reports", "top-services"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-12-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Chủ Sân - Court Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 550px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .business-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .business-section h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .user-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .user-link a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+            background: #52c41a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 14px 28px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(82, 196, 26, 0.3);
+        }
+
+        .user-link a:hover {
+            background: #45b514;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(82, 196, 26, 0.5);
+        }
+
+        .back-home-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .back-home-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .back-home-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            display: none;
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            display: none;
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .required {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <div class="logo">
+        <h1>🏢 Court Booking</h1>
+        <p>Đăng ký tài khoản chủ sân</p>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="fullName">Họ và tên <span class="required">*</span></label>
+            <input type="text" id="fullName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Mật khẩu <span class="required">*</span></label>
+            <input type="password" id="password" minlength="6" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phoneNumber">Số điện thoại <span class="required">*</span></label>
+            <input type="tel" id="phoneNumber" required>
+        </div>
+
+        <div class="business-section">
+            <h3>Thông tin kinh doanh</h3>
+
+            <div class="form-group">
+                <label for="businessName">Tên cơ sở <span class="required">*</span></label>
+                <input type="text" id="businessName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="businessAddress">Địa chỉ cơ sở <span class="required">*</span></label>
+                <textarea id="businessAddress" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="taxCode">Mã số thuế</label>
+                <input type="text" id="taxCode">
+            </div>
+        </div>
+
+        <button type="submit" class="btn-register">Đăng ký chủ sân</button>
+    </form>
+
+    <div class="login-link">
+        Đã có tài khoản? <a href="/login">Đăng nhập</a>
+    </div>
+
+    <div class="user-link">
+        <a href="/register">🎾 Đăng ký khách hàng</a>
+    </div>
+
+    <div class="back-home-link">
+        <a href="/">Quay về trang chủ</a>
+    </div>
+</div>
+
+<script>
+    const registerForm = document.getElementById('registerForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+
+        const data = {
+            fullName: fullName.value,
+            email: email.value,
+            password: password.value,
+            phoneNumber: phoneNumber.value,
+            roleType: 'COURT_OWNER',
+            businessName: businessName.value,
+            businessAddress: businessAddress.value,
+            taxCode: taxCode.value
+        };
+
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const json = await res.json();
+
+            if (res.ok) {
+                successMessage.textContent = 'Đăng ký thành công! Chuyển hướng đăng nhập...';
+                successMessage.style.display = 'block';
+                setTimeout(() => location.href = '/login', 1500);
+            } else {
+                errorMessage.textContent = json.message || 'Đăng ký thất bại';
+                errorMessage.style.display = 'block';
+            }
+        } catch {
+            errorMessage.textContent = 'Lỗi kết nối máy chủ';
+            errorMessage.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>
+

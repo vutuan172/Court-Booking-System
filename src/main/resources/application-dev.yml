@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/court_booking_dev?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: yourpassword
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+logging:
+  level:
+    com.example.booking: DEBUG
+    org.springframework.security: DEBUG

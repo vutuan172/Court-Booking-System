@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews & Feedback - Court Booking</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .back-btn:hover { transform: translateY(-2px); }
+        
+        .court-title {
+            font-size: 28px;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+        
+        .court-info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .court-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .reviews-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .write-review-btn {
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            transition: all 0.2s;
+        }
+        
+        .write-review-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+        }
+        
+        .review-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .star-rating {
+            font-size: 40px;
+            cursor: pointer;
+        }
+        
+        .star {
+            color: #ddd;
+            transition: color 0.2s;
+            margin: 0 2px;
+        }
+        
+        .star:hover, .star.active {
+            color: #FFA500;
+        }
+        
+        .review-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .review-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .reviews-list {
+            margin-top: 30px;
+        }
+        
+        .review-card {
+            background: #fff;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+        
+        .review-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .reviewer-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .review-stars {
+            color: #FFA500;
+            font-size: 18px;
+        }
+        
+        .review-date {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .review-comment {
+            color: #555;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .review-image {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+        
+        .message.success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .message.error { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); }
+        
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="court-title" id="courtName">Loading...</h1>
+            <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Sidebar - Court Info -->
+            <div class="court-info-card">
+                <img id="courtImage" class="court-image" src="" alt="Court">
+                <div class="info-item">
+                    <div class="info-label">Type</div>
+                    <div class="info-value" id="courtType">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Location</div>
+                    <div class="info-value" id="courtLocation">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Price</div>
+                    <div class="info-value" id="courtPrice">-</div>
+                </div>
+            </div>
+            
+            <!-- Right - Reviews Section -->
+            <div class="reviews-section">
+                <h2 class="section-title">⭐ Reviews & Feedback</h2>
+                
+                <!-- Stats -->
+                <div class="stats-grid" id="statsGrid" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgRating">0.0</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="stat-value" id="totalReviews">0</div>
+                        <div class="stat-label">Total Reviews</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                        <div class="stat-value" id="fiveStars">0</div>
+                        <div class="stat-label">5-Star Reviews</div>
+                    </div>
+                </div>
+                
+                <!-- Write Review Button -->
+                <button class="write-review-btn" id="writeReviewBtn" onclick="toggleReviewForm()">
+                    ✍️ Write a Review
+                </button>
+                
+                <!-- Review Form -->
+                <div class="review-form" id="reviewForm">
+                    <div class="form-group">
+                        <label class="form-label">Rating:</label>
+                        <div class="star-rating" id="starRating">
+                            <span class="star" data-rating="1" onclick="setRating(1)">★</span>
+                            <span class="star" data-rating="2" onclick="setRating(2)">★</span>
+                            <span class="star" data-rating="3" onclick="setRating(3)">★</span>
+                            <span class="star" data-rating="4" onclick="setRating(4)">★</span>
+                            <span class="star" data-rating="5" onclick="setRating(5)">★</span>
+                        </div>
+                        <input type="hidden" id="selectedRating" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Your Review:</label>
+                        <textarea id="reviewComment" class="review-textarea" rows="4" placeholder="Share your experience..."></textarea>
+                    </div>
+                    <button class="submit-btn" onclick="submitReview()">Submit Review</button>
+                </div>
+                
+                <!-- Reviews List -->
+                <div class="reviews-list" id="reviewsList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>Loading reviews...</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="message" id="message"></div>
+    
+    <script>
+        let currentCourtId = null;
+        let userBookings = [];
+        
+        // Get court ID from URL
+        function getCourtIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('courtId');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            currentCourtId = getCourtIdFromURL();
+            if (!currentCourtId) {
+                showMessage('No court selected', 'error');
+                setTimeout(() => window.location.href = '/dashboard', 2000);
+                return;
+            }
+            
+            loadCourtInfo();
+            loadReviews();
+            checkUserBookings();
+        });
+        
+        // Load court information
+        function loadCourtInfo() {
+            fetch('/api/courts/' + currentCourtId)
+                .then(response => response.json())
+                .then(result => {
+                    const court = result.data || result;
+                    document.getElementById('courtName').textContent = court.name || 'Court Details';
+                    document.getElementById('courtType').textContent = court.type || 'N/A';
+                    document.getElementById('courtLocation').textContent = court.location || 'N/A';
+                    document.getElementById('courtPrice').textContent = (court.basePricePerHour || court.pricePerHour || 0).toLocaleString('vi-VN') + ' đ/hour';
+                    
+                    if (court.imageUrl) {
+                        document.getElementById('courtImage').src = court.imageUrl;
+                    }
+                })
+                .catch(error => console.error('Error loading court:', error));
+        }
+        
+        // Load reviews
+        function loadReviews() {
+            console.log('🔍 Loading reviews for court:', currentCourtId);
+            fetch('/api/reviews/court/' + currentCourtId)
+                .then(response => {
+                    console.log('📡 Response status:', response.status);
+                    return response.json();
+                })
+                .then(result => {
+                    console.log('📦 Full API response:', result);
+                    // API returns: { success: true, message: "...", data: [...] }
+                    const reviews = result.data || [];
+                    console.log('✅ Total reviews:', reviews.length, reviews);
+                    
+                    // Calculate stats
+                    if (reviews.length > 0) {
+                        const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+                        const fiveStars = reviews.filter(r => r.rating === 5).length;
+                        
+                        document.getElementById('statsGrid').style.display = 'grid';
+                        document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+                        document.getElementById('totalReviews').textContent = reviews.length;
+                        document.getElementById('fiveStars').textContent = fiveStars;
+                    }
+                    
+                    // Display reviews
+                    displayReviews(reviews);
+                })
+                .catch(error => {
+                    console.error('Error loading reviews:', error);
+                    showMessage('Error loading reviews', 'error');
+                });
+        }
+        
+        // Display reviews
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviewsList');
+            
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>No reviews yet</h3>
+                        <p>Be the first to review this court!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = reviews.map(review => {
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                const date = new Date(review.createdAt).toLocaleDateString('vi-VN');
+                const initial = (review.userName || 'User').charAt(0).toUpperCase();
+                const imageHtml = review.imageUrl ? `<img src="${review.imageUrl}" class="review-image" alt="Review">` : '';
+                
+                return `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">${initial}</div>
+                                <div>
+                                    <div class="reviewer-name">${review.userName || 'Anonymous'}</div>
+                                    <div class="review-stars">${stars}</div>
+                                </div>
+                            </div>
+                            <div class="review-date">${date}</div>
+                        </div>
+                        <div class="review-comment">${review.comment || ''}</div>
+                        ${imageHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Check user bookings
+        function checkUserBookings() {
+            fetch('/api/bookings/my-bookings')
+                .then(response => response.json())
+                .then(result => {
+                    userBookings = (result.data || result || []).filter(b => 
+                        b.courtId == currentCourtId && (b.status === 'CONFIRMED' || b.status === 'COMPLETED')
+                    );
+                })
+                .catch(error => console.error('Error checking bookings:', error));
+        }
+        
+        // Toggle review form
+        function toggleReviewForm() {
+            const form = document.getElementById('reviewForm');
+            const btn = document.getElementById('writeReviewBtn');
+            
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+                btn.textContent = '✕ Cancel';
+            } else {
+                form.style.display = 'none';
+                btn.textContent = '✍️ Write a Review';
+            }
+        }
+        
+        // Set rating
+        function setRating(rating) {
+            document.getElementById('selectedRating').value = rating;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+        
+        // Submit review
+        function submitReview() {
+            const rating = parseInt(document.getElementById('selectedRating').value);
+            const comment = document.getElementById('reviewComment').value.trim();
+            
+            if (rating === 0) {
+                showMessage('Please select a rating', 'error');
+                return;
+            }
+            
+            if (userBookings.length === 0) {
+                showMessage('You need a confirmed booking to review', 'error');
+                return;
+            }
+            
+            const bookingId = userBookings[0].id;
+            
+            fetch('/api/reviews/booking/' + bookingId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rating, comment })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showMessage('✅ Review submitted successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showMessage('❌ ' + (result.message || 'Failed to submit'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('❌ Error submitting review', 'error');
+            });
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+</html>
