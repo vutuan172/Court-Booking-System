@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt sân - Hệ thống đặt sân thể thao</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px 0; }
+        .header-content { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .back-btn { color: #fff; text-decoration: none; display: inline-block; margin-bottom: 10px; }
+        .back-btn:hover { text-decoration: underline; }
+        
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .booking-form { background: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        .court-info { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .court-name { font-size: 1.8em; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .court-type { display: inline-block; background: #667eea; color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; }
+        .court-price { font-size: 1.5em; color: #764ba2; font-weight: bold; margin-top: 10px; }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        
+        .time-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .time-slot { padding: 12px; border: 2px solid #ddd; border-radius: 5px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .time-slot:hover { border-color: #667eea; background: #f0f0ff; }
+        .time-slot.selected { border-color: #667eea; background: #667eea; color: #fff; }
+        .time-slot.unavailable { background: #f5f5f5; color: #999; cursor: not-allowed; border-color: #e0e0e0; }
+        
+        .price-summary { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 30px; }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .price-total { font-size: 1.3em; font-weight: bold; color: #667eea; border-top: 2px solid #ddd; padding-top: 15px; margin-top: 15px; }
+        
+        .submit-btn { background: #667eea; color: #fff; padding: 15px 40px; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 20px; }
+        .submit-btn:hover { background: #5568d3; }
+        .submit-btn:disabled { background: #999; cursor: not-allowed; }
+        
+        .error-message { background: #ffebee; color: #c62828; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+        .success-message { background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="/dashboard" class="back-btn">← Quay lại bảng điều khiển</a>
+            <h1>Đặt sân</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+        
+        <div class="booking-form">
+            <div class="court-info" id="courtInfo">
+                <!-- Thông tin sân sẽ được tải tại đây -->
+            </div>
+            
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="bookingDate">Chọn ngày:</label>
+                    <input type="date" id="bookingDate" name="bookingDate" required>
+                </div>
+                
+                <div class="form-group" id="subCourtGroup" style="display: none;">
+                    <label for="subCourtSelect">Chọn sân con:</label>
+                    <select id="subCourtSelect" name="subCourtId">
+                        <option value="">-- Chọn sân con --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Khung giờ còn trống:</label>
+                    <div class="time-slots" id="timeSlots">
+                        <!-- Khung giờ sẽ được tải tại đây -->
+                    </div>
+                    <input type="hidden" id="selectedStartTime" name="startTime">
+                    <input type="hidden" id="selectedEndTime" name="endTime">
+                </div>
+                
+                <div class="price-summary">
+                    <h3>Tóm tắt giá</h3>
+                    <div class="price-row">
+                        <span>Giá mỗi giờ:</span>
+                        <span id="courtPrice">0 VND</span>
+                    </div>
+                    <div class="price-row price-total">
+                        <span>Tổng cộng:</span>
+                        <span id="totalPrice">0 VND</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">Xác nhận đặt sân</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let courtData = null;
+        let selectedSlot = null;
+        let availableSlots = [];
+        
+        // Quản lý tiền tệ
+        let currentCurrency = localStorage.getItem('currency') || 'VND';
+        
+        function formatPrice(price) {
+            const numPrice = Number(price) || 0;
+            if (isNaN(numPrice)) return '0 VND';
+            if (currentCurrency === 'VND') {
+                return numPrice.toLocaleString('vi-VN') + ' VND';
+            } else {
+                return '$' + (numPrice / 25000).toFixed(2);
+            }
+        }
+        
+        // Lấy courtId từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const courtId = urlParams.get('courtId');
+        
+        // Tải thông tin sân
+        async function loadCourtInfo() {
+            try {
+                const response = await fetch(`/api/courts/${courtId}`);
+                const result = await response.json();
+                courtData = result.data || result;
+                
+                if (!courtData || !courtData.name) {
+                    throw new Error('Dữ liệu sân không hợp lệ');
+                }
+                
+                document.getElementById('courtInfo').innerHTML = `
+                    ${courtData.imageUrl ? `<div style="width: 100%; height: 220px; overflow: hidden; border-radius: 8px; margin-bottom: 20px;"><img src="${courtData.imageUrl}" alt="${courtData.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.style.display='none'"></div>` : ''}
+                    <div class="court-name">${courtData.name}</div>
+                    <span class="court-type">${courtData.type}</span>
+                    <div style="color: #666; margin: 10px 0;">📍 ${courtData.location}</div>
+                    <div class="court-price">${formatPrice(courtData.basePricePerHour || 0)}/giờ</div>
+                `;
+                
+                const pricePerHour = courtData.basePricePerHour || 0;
+                document.getElementById('courtPrice').textContent = formatPrice(pricePerHour);
+                document.getElementById('totalPrice').textContent = formatPrice(pricePerHour);
+                
+                loadSubCourts();
+            } catch (error) {
+                console.error('Lỗi khi tải sân:', error);
+                showError('Không thể tải thông tin sân');
+            }
+        }
+        
+        async function loadSubCourts() {
+            try {
+                const response = await fetch(`/api/subcourts/court/${courtId}/available`);
+                const result = await response.json();
+                const subCourts = result.data || [];
+                
+                if (subCourts.length > 0) {
+                    const select = document.getElementById('subCourtSelect');
+                    select.innerHTML = '<option value="">-- Chọn sân con --</option>' + 
+                        subCourts.map(sc => `<option value="${sc.id}">${sc.name}</option>`).join('');
+                    document.getElementById('subCourtGroup').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải sân con:', error);
+            }
+        }
+        
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('bookingDate').setAttribute('min', today);
+        
+        document.getElementById('bookingDate').addEventListener('change', async function() {
+            const date = this.value;
+            if (!date) return;
+            
+            try {
+                const response = await fetch(`/api/courts/${courtId}/schedules?date=${date}`);
+                const result = await response.json();
+                availableSlots = result.data || [];
+                
+                renderTimeSlots();
+            } catch (error) {
+                console.error('Lỗi khi tải lịch:', error);
+                showError('Không thể tải khung giờ trống');
+            }
+        });
+        
+        function renderTimeSlots() {
+            const container = document.getElementById('timeSlots');
+            
+            if (availableSlots.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Không có khung giờ trống trong ngày này</p>';
+                return;
+            }
+            
+            container.innerHTML = availableSlots.map(slot => {
+                const isAvailable = slot.status === 'AVAILABLE';
+                const slotPrice = slot.price || 0;
+                return `
+                    <div class="time-slot ${!isAvailable ? 'unavailable' : ''}" 
+                         onclick="${isAvailable ? `selectTimeSlot(${slot.id}, '${slot.startTime}', '${slot.endTime}', ${slotPrice})` : ''}"
+                         id="slot-${slot.id}">
+                        ${slot.startTime}<br>${slot.endTime}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function selectTimeSlot(slotId, startTime, endTime, price) {
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            document.getElementById(`slot-${slotId}`).classList.add('selected');
+            
+            selectedSlot = { slotId, startTime, endTime, price };
+            document.getElementById('selectedStartTime').value = startTime;
+            document.getElementById('selectedEndTime').value = endTime;
+            
+            updatePrice(price);
+        }
+        
+        function updatePrice(price) {
+            const numPrice = Number(price) || 0;
+            const formattedPrice = formatPrice(numPrice);
+            document.getElementById('courtPrice').textContent = formattedPrice;
+            document.getElementById('totalPrice').textContent = formattedPrice;
+        }
+        
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedSlot) {
+                showError('Vui lòng chọn khung giờ');
+                return;
+            }
+            
+            const subCourtId = document.getElementById('subCourtSelect').value;
+            
+            const bookingData = {
+                courtId: parseInt(courtId),
+                bookingDate: document.getElementById('bookingDate').value,
+                startTime: selectedSlot.startTime,
+                endTime: selectedSlot.endTime,
+                scheduleId: selectedSlot.slotId
+            };
+            
+            // Include subCourtId if selected
+            if (subCourtId) {
+                bookingData.subCourtId = parseInt(subCourtId);
+            }
+            
+            try {
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').textContent = 'Đang xử lý...';
+                
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Đặt sân thành công! Đang chuyển hướng...');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard?booking=success';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    showError(error.message || 'Đặt sân thất bại. Vui lòng thử lại.');
+                    document.getElementById('submitBtn').disabled = false;
+                    document.getElementById('submitBtn').textContent = 'Xác nhận đặt sân';
+                }
+            } catch (error) {
+                showError('Có lỗi xảy ra. Vui lòng thử lại.');
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = 'Xác nhận đặt sân';
+            }
+        });
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+        
+        if (courtId) {
+            loadCourtInfo();
+        } else {
+            showError('Chưa chọn sân');
+        }
+    </script>
+</body>
+</html>
